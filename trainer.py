@@ -52,7 +52,7 @@ class Trainer:
         self._reset_metrics()
         tbar = tqdm(self.train_loader, ncols=160)
         tic = time.time()
-        for img, gt in tbar:
+        for img, gt, veiw2 in tbar:
             self.data_time.update(time.time() - tic)
             img = img.cuda(non_blocking=True)
             gt = gt.cuda(non_blocking=True)
@@ -60,7 +60,8 @@ class Trainer:
             if self.CFG.amp is True:
                 with torch.cuda.amp.autocast(enabled=True):
                     pre = self.model(img)
-                    loss = self.loss(pre, gt)
+                    pre_aug = self.model(veiw2)
+                    loss = self.loss(pre, gt)/2 + self.loss(pre_aug, gt)/2
                 self.scaler.scale(loss).backward()
                 self.scaler.step(self.optimizer)
                 self.scaler.update()

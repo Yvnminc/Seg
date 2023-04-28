@@ -4,6 +4,7 @@ import torch
 from torch.utils.data import Dataset
 from torchvision.transforms import Compose, RandomHorizontalFlip, RandomVerticalFlip
 from utils.helpers import Fix_RandomRotation
+import torchvision.transforms as T
 
 
 class vessel_dataset(Dataset):
@@ -41,7 +42,8 @@ class vessel_dataset(Dataset):
             torch.manual_seed(seed)
             gt = self.transforms(gt)
 
-        return img, gt
+        view2 = T.ColorJitter(brightness=0.5, contrast=0.5, saturation=0.5)(img)
+        return img, gt, view2
 
     def _select_img(self, file_list):
         img_list = []
